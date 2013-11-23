@@ -7,7 +7,7 @@ Animators have known this for decades, only needing to illustrate a handful of
 mouth shapes to make dialogue look plausible on cartoon characters.
 
 Exploiting the quantity of homovisemes for humor has gained popularity recently
-in creations like [Bad Lip Reading](badlipreading.com).
+in creations like [Bad Lip Reading](http://www.badlipreading.com).
 
 The Carnegie Mellon Pronouncing Dictionary provides a word-to-phoneme mapping.
 Combining this with a phoneme-to-viseme mapping from Lee and Yook ("Audio-to-
