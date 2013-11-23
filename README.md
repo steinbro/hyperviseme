@@ -20,10 +20,10 @@ Give it a try:
 
 Some nice examples:
 
-  yale college -> hancock itch
-  the look of love -> tycoon of knife
-  one more time -> wine boredom
-  time to check out -> subdue jackass
+* yale college -> hancock itch
+* the look of love -> tycoon of knife
+* one more time -> wine boredom
+*  time to check out -> subdue jackass
 
 
 BSD licensed. 
