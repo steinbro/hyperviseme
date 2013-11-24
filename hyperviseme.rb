@@ -4,77 +4,65 @@ require 'pstore'
 
 v = PStore.new("visemes.pstore")
 v.transaction(true){ $visemes = v[:visemes] }
+
 v = PStore.new("inverse.pstore")
 v.transaction(true){ $inverse = v[:inverse] }
 
-class String
-  #def to_phonemes
-  #  self.split.map
-  #end
-
-  def to_visemes
-    self.downcase.gsub(/\.|,|\?|!/, "").split.map{|w| $visemes[w] }.flatten
-  end
+# Find shortest set of visemes at the beginning of the array that resembles a
+# word
+def find_shortest_prefix(visemes, min_length=0)
+  buffer = visemes[0..min_length]
+  while not $inverse.has_key?(buffer)
+    if buffer.length < visemes.length
+      buffer = visemes[0..buffer.length]
+    else
+      return nil
+    end
+	end
+  return buffer.length
 end
 
-class Array
-  def sum
-    self.inject(0) {|total, n| total + n }
-  end
+# Recursively find all possible ways to split the array of visemes into
+# sub-arrays such that each sub-array resembles a word.
+def find_possible_chunks(visemes, current=[])
+  successes = []
+  n = 0
+  while n < visemes.length
+    n = find_shortest_prefix(visemes, n)
 
-  def random_choice
-    self[rand(self.length)]
-  end
+    # no prefix looks like a word
+    break if n.nil?
 
-  def random_chunkify(max_length)
-    sizes = []
-    while sizes.sum < self.length
-      nextsize = rand(max_length - 1) + 1
-      if sizes.sum + nextsize <= self.length
-        sizes.push(nextsize)
-      end
+    # shortest prefix is entire list
+    if n == visemes.length
+      return successes + [current + [visemes[0...n]]]
     end
-    i = 0
-    sizes.map do |l|
-      i += l
-      self[i-l...i]
-    end
+
+    # recurse over everything except this prefix
+    successes += find_possible_chunks(visemes[n..-1], current + [visemes[0...n]])
   end
+  return successes
 end
 
-#puts vises.inspect
-#0.upto(vises.length / 3) do |i|
-#  subvise = vises[3*i...3*(i+1)]
-#  matches = $inverse[subvise]
-#  puts "#{subvise.inspect}: #{matches.inspect}"
-#end
-
+# convert input argument to visemes
 phrase = ARGV[0]
-vises = phrase.to_visemes
+vises = phrase.downcase.gsub(/\.|,|\?|!/, "").split
+              .map{|w| $visemes[w] }.flatten
 
-i = vises.length < 20 ? vises.length : 20
-sizes = []
-j =  0
-while j < vises.length
-  while not $inverse.has_key?(vises[j...j+i])
-    i -= 1
-    if i == 0
-      puts vises.inspect
-      exit
-    end
+puts phrase, vises.inspect
+
+# larger chunks are potentially more interesting, so reverse to show them first
+chunks = find_possible_chunks(vises).reverse
+
+# display results
+chunks.each do |chunkification|
+  puts chunkification.inspect
+
+  alternatives = chunkification.map{|visemes| $inverse[visemes] }
+  alternatives.map{|a| a.length }.max.times do |row|
+    puts '  ' + alternatives
+               .map{|col| col[row].to_s.ljust(col.map{|x| x.length }.max) }
+               .join('  ')
   end
-  j += i
-  sizes.push(i)
-  i = vises.length  - j < 20 ? vises.length - j : 20
+  puts
 end
-
-i = 0
-chunks = sizes.map do |l|
-  i += l
-  vises[i-l...i]
-end
-#chunks = vises.random_chunkify(8)
-alternatives = chunks.map{|vis| $inverse[vis]}
-
-puts phrase, chunks.inspect
-puts alternatives
