@@ -1,5 +1,5 @@
 cmudict:
-	wget https://cmusphinx.svn.sourceforge.net/svnroot/cmusphinx/trunk/cmudict/cmudict.0.6d -O cmudict
+	wget https://raw.githubusercontent.com/cmusphinx/pocketsphinx/master/model/en-us/cmudict-en-us.dict -O cmudict
 
 visemes: cmudict
 	./make_viseme_map.rb > visemes
